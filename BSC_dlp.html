@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="恆威執修">
+  <title>恆威執修清單 - BSC Defect Rectification Inspection & Management Platform</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-dark: #172554;
+      --accent: #d97706;
+      --accent-light: #fef3c7;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: white;
+      padding: 16px 24px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-content {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-dlp {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .title-group h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .title-group p {
+      font-size: 0.8rem;
+      color: #93c5fd;
+      font-weight: 500;
+    }
+
+    .autosave-pill {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      color: #bbf7d0;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .breadcrumbs span {
+      cursor: pointer;
+      color: var(--primary-light);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .breadcrumbs span:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumbs .current {
+      color: var(--text);
+      cursor: default;
+      font-weight: 600;
+      text-decoration: none !important;
+    }
+
+    .breadcrumbs svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    /* Tower Selector Bar (T1, T2, T3, T5) */
+    .tower-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tower-card-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .tower-card-btn:hover {
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .tower-card-btn.active {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2);
+    }
+
+    .tower-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .tower-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .tower-badge-count {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: #e2e8f0;
+      color: var(--text);
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .tower-card-btn.active .tower-badge-count {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Tab Bar */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 2px;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      border-radius: 6px 6px 0 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    .tab-counter {
+      background: var(--border-dark);
+      color: var(--text);
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .tab-btn.active .tab-counter {
+      background: var(--primary);
+      color: white;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-light); }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: #b45309; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #166534; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #991b1b; }
+    .btn-outline { background: transparent; border: 1px solid var(--border-dark); color: var(--text); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+
+    /* Dashboard Widgets */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--primary-light);
+    }
+    .stat-card.subcon::before { background: var(--accent); }
+
+    .stat-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Subcontractor Cards (Total, Pending, Completed) */
+    .subcon-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .subcon-stat-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .subcon-stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subcon-name-badge {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .subcon-total-badge {
+      background: var(--primary);
+      color: white;
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 0.72rem;
+      font-weight: bold;
+    }
+
+    .subcon-stat-numbers {
+      display: flex;
+      gap: 8px;
+      font-size: 0.75rem;
+    }
+
+    .subcon-stat-pending {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .subcon-stat-done {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Unit Box Cards */
+    .unit-box-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .unit-box-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .unit-box-card:hover {
+      border-color: var(--primary-light);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .unit-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .unit-box-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unit-box-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .unit-action-btn {
+      color: #94a3b8;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 3px 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+
+    .unit-action-btn:hover {
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .unit-action-btn.del:hover {
+      color: var(--danger);
+      background: #fee2e2;
+    }
+
+    .unit-box-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .unit-box-subcons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .company-pill {
+      background: #eff6ff;
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .unit-box-defects-preview {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .unit-box-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Defect in Unit Card */
+    .defect-in-unit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .defect-in-unit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .defect-in-unit-card.completed {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
+
+    .defect-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .defect-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .status-badge.pending {
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .status-badge.done {
+      background: #f0fdf4;
+      color: var(--success);
+      border: 1px solid #bbf7d0;
+    }
+
+    .unit-media-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .media-thumb-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .media-thumb {
+      width: 76px;
+      height: 76px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .media-thumb:hover { transform: scale(1.04); }
+
+    .thumb-del-btn {
+      position: absolute;
+      top: -4px; right: -4px; width: 18px; height: 18px;
+      background: var(--danger); color: white; border-radius: 50%;
+      border: none; font-size: 11px; line-height: 18px;
+      cursor: pointer; text-align: center; font-weight: bold;
+    }
+
+    .media-video-badge {
+      width: 76px; height: 76px; border-radius: 6px;
+      background: #1e293b; color: #f8fafc; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      font-size: 0.7rem; gap: 4px; text-decoration: none; text-align: center; padding: 4px;
+    }
+
+    .unit-remark {
+      font-size: 0.8rem; color: var(--text-muted); background: #f8fafc;
+      padding: 6px 10px; border-radius: 4px; border-left: 3px solid var(--border-dark);
+    }
+
+    /* Tables */
+    .all-defects-table-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow);
+    }
+
+    .data-table {
+      width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;
+    }
+
+    .data-table th {
+      background: #1e3a8a; color: white; padding: 10px 14px; font-weight: 600; white-space: nowrap;
+    }
+
+    .data-table td {
+      border-bottom: 1px solid var(--border); padding: 10px 14px; vertical-align: middle;
+    }
+
+    .data-table tr:hover { background: #f8fafc; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100; padding: 16px;
+    }
+
+    .modal-box {
+      background: white; border-radius: var(--radius); max-width: 580px;
+      width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); padding: 24px;
+    }
+
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;
+    }
+
+    .modal-header h3 { font-size: 1.15rem; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--border-dark); border-radius: 6px; font-size: 0.9rem; }
+    .form-control:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+    .tag-manager-box {
+      background: #f8fafc; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px; margin-top: 8px;
+    }
+
+    .tag-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;
+    }
+
+    .quick-tags {
+      display: flex; flex-wrap: wrap; gap: 6px; max-height: 140px; overflow-y: auto; padding-bottom: 4px;
+    }
+
+    .quick-tag {
+      background: #ffffff; font-size: 0.75rem; padding: 3px 8px; border-radius: 20px;
+      cursor: pointer; border: 1px solid var(--border-dark); display: inline-flex;
+      align-items: center; gap: 5px; transition: all 0.15s ease; user-select: none;
+    }
+
+    .quick-tag:hover { background: #eff6ff; border-color: var(--primary-light); color: var(--primary); }
+    .tag-text { cursor: pointer; }
+    .tag-del-btn { color: #94a3b8; font-weight: bold; border-radius: 50%; padding: 0 3px; font-size: 11px; }
+    .tag-del-btn:hover { color: var(--danger); background: #fee2e2; }
+    .tag-input-row { display: flex; gap: 6px; margin-top: 8px; }
+    .tag-add-input { flex: 1; padding: 4px 8px; font-size: 0.8rem; border: 1px solid var(--border-dark); border-radius: 4px; }
+
+    .media-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+    .media-upload-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; padding: 12px; background: #f8fafc; border: 1px dashed var(--border-dark);
+      border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.8rem;
+      font-weight: 600; color: var(--text); transition: all 0.2s;
+    }
+    .media-upload-btn:hover { background: #eff6ff; border-color: var(--primary-light); color: var(--primary); }
+    .media-upload-btn svg { width: 22px; height: 22px; color: var(--primary); }
+
+    .radio-option-card {
+      border: 1px solid var(--border-dark); border-radius: 8px; padding: 12px;
+      margin-bottom: 10px; cursor: pointer; display: flex; gap: 12px; align-items: flex-start;
+      transition: all 0.2s;
+    }
+    .radio-option-card:hover { background: #f8fafc; }
+    .radio-option-card.selected { border-color: var(--primary); background: #eff6ff; }
+
+    .floor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .floor-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .floor-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .floor-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .floor-badge { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+    .floor-tower { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .floor-del-btn {
+      color: #94a3b8; background: transparent; border: 1px solid transparent; border-radius: 4px;
+      padding: 3px 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;
+    }
+    .floor-del-btn:hover { color: var(--danger); background: #fee2e2; border-color: #fecaca; }
+
+    #imageLightboxModal img { max-width: 100%; max-height: 80vh; border-radius: 8px; }
+    #toastNotification {
+      position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: white;
+      padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; display: none;
+      align-items: center; gap: 8px; box-shadow: var(--shadow-lg); z-index: 200;
+    }
+
+    @media (max-width: 640px) {
+      .header-content { flex-direction: column; align-items: flex-start; }
+      .tower-bar { grid-template-columns: repeat(2, 1fr); }
+      .tab-bar { overflow-x: auto; }
+      .media-btn-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="logo-area">
+        <span class="badge-dlp">BSC DLP</span>
+        <div class="title-group">
+          <h1>恆威執修清單</h1>
+          <p>BSC Defect Rectification Inspection & Management Platform</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <div class="autosave-pill" id="autoSaveIndicator">
+          <span style="font-size:10px;">🟢</span>
+          <span>本機已自動儲存</span>
+        </div>
+        <button class="btn btn-outline" style="color:white; border-color:rgba(255,255,255,0.4);" onclick="openCloudSyncModal()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          ☁️ 雲端共享/團隊協作
+        </button>
+        <button class="btn btn-outline" style="color:white; border-color:rgba(255,255,255,0.4);" onclick="resetSampleData()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          重置空白
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="breadcrumbs" id="breadcrumbsNav"></div>
+
+    <!-- VIEW 1: Floor List (Home with Tower Tabs: T1, T2, T3, T5) -->
+    <div id="viewFloors" class="app-view">
+      
+      <!-- Tower Selection Tabs (T1, T2, T3, T5) -->
+      <div class="tower-bar" id="towerBarContainer"></div>
+
+      <div class="section-header">
+        <div class="section-title">
+          <span id="currentTowerSectionTitle">T1 座樓層清單</span>
+          <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted);">(建立樓層後將自動產生單位，預設 0 瑕疵)</span>
+        </div>
+        <button class="btn btn-primary" onclick="openNewFloorModal()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          新增此座樓層
+        </button>
+      </div>
+
+      <div class="floor-grid" id="floorListContainer"></div>
+    </div>
+
+    <!-- VIEW 2: Floor Dashboard -->
+    <div id="viewFloorDetail" class="app-view" style="display:none;">
+      
+      <!-- Top Floor Dashboard KPIs with Subcontractor Breakdown -->
+      <div class="stats-grid" id="floorStatsGrid"></div>
+
+      <!-- Action & Switch Bar -->
+      <div class="section-header" style="margin-bottom:12px;">
+        <div class="section-title">
+          <span id="currentFloorTitle">巡查工作台</span>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-accent" onclick="openExportModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            匯出 Excel
+          </button>
+          <button class="btn btn-primary" onclick="openNewUnitModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            手動新增單位
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab View Switcher (按單位分類 VS 一次性全層總覽) -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tabUnitsBtn" onclick="switchFloorTab('units')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          按單位分類巡查 (Units)
+          <span class="tab-counter" id="badgeUnitsCount">0</span>
+        </button>
+
+        <button class="tab-btn" id="tabAllDefectsBtn" onclick="switchFloorTab('all_defects')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          一次性查看全層所有 Defect 與公司 (All Defects)
+          <span class="tab-counter" id="badgeAllDefectsCount">0</span>
+        </button>
+      </div>
+
+      <!-- SUB-VIEW A: Units Grid -->
+      <div id="subViewUnits">
+        <div class="unit-box-grid" id="floorUnitsContainer"></div>
+      </div>
+
+      <!-- SUB-VIEW B: All Defects List -->
+      <div id="subViewAllDefects" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div style="font-size:0.85rem; color:var(--text-muted);">
+            匯總該樓層所有單位的瑕疵項目、所屬責任公司、現場相片與執修狀態：
+          </div>
+          <div style="display:flex; gap:8px;">
+            <select id="filterSubconSelect" class="form-control" style="width:auto; font-size:0.8rem; padding:4px 8px;" onchange="renderAllDefectsTable()">
+              <option value="">全部公司 / 分判商</option>
+            </select>
+            <select id="filterStatusSelect" class="form-control" style="width:auto; font-size:0.8rem; padding:4px 8px;" onchange="renderAllDefectsTable()">
+              <option value="">全部狀態</option>
+              <option value="待執修">待執修</option>
+              <option value="已完成">已完成</option>
+            </select>
+          </div>
+        </div>
+        <div class="all-defects-table-box">
+          <table class="data-table" id="allDefectsTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: Inside a Specific Unit -->
+    <div id="viewUnitDetail" class="app-view" style="display:none;">
+      <div class="card" id="unitDetailBanner" style="border-left: 6px solid var(--primary);"></div>
+
+      <div class="section-header">
+        <div class="section-title">
+          <span>該單位的 Defect 瑕疵與所屬公司清單</span>
+        </div>
+        <button class="btn btn-primary" onclick="openNewDefectModal()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          新增此單位瑕疵 (Defect)
+        </button>
+      </div>
+
+      <div class="defect-in-unit-grid" id="unitDefectsContainer"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add Floor (With Tower Selection & Auto Unit Generation) -->
+  <div class="modal-overlay" id="modalNewFloor">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>新增巡查樓層</h3>
+        <button class="modal-close" onclick="closeModal('modalNewFloor')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>大樓座別 (Tower)</label>
+        <select id="inputNewTower" class="form-control">
+          <option value="T1">T1 (自動產生 AA~BG 12個單位)</option>
+          <option value="T2">T2 (自動產生 AA~BF 11個單位)</option>
+          <option value="T3">T3 (自動產生 AA~BF 11個單位)</option>
+          <option value="T5">T5 (自動產生 AA~BG 12個單位)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>樓層編號 (Floor)</label>
+        <input type="text" id="inputNewFloor" class="form-control" placeholder="例如: 9F, 12F, G/F, Podium 3F">
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted); background:#f1f5f9; padding:8px 12px; border-radius:6px; margin-bottom:12px;">
+        💡 提示：建立後系統將自動為該樓層產生對應座別的標準單位，瑕疵初始為 0，可隨時手動刪除或修改單位名稱。
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('modalNewFloor')">取消</button>
+        <button class="btn btn-primary" onclick="saveNewFloor()">確認建立樓層</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add Unit (With Duplicate Check & AA~BG Preset Tags) -->
+  <div class="modal-overlay" id="modalNewUnit">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>在該樓層手動新增單位</h3>
+        <button class="modal-close" onclick="closeModal('modalNewUnit')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>單位名稱 / 位置 (Unit Name)</label>
+        <input type="text" id="inputUnitName" class="form-control" placeholder="例如: AA, AB, 或自訂位置">
+        
+        <div class="tag-manager-box">
+          <div class="tag-header">
+            <span>常用單位固定選項 (AA, AB, AC, AD, AE, BA, BB, BC, BD, BE, BF, BG)</span>
+          </div>
+          <div class="quick-tags" id="presetUnitTagsContainer"></div>
+          <div class="tag-input-row">
+            <input type="text" id="newUnitTagInput" class="tag-add-input" placeholder="新增固定單位標籤">
+            <button class="btn btn-sm btn-outline" onclick="addNewUnitTag()">+ 新增選項</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('modalNewUnit')">取消</button>
+        <button class="btn btn-primary" onclick="saveNewUnit()">確認建立單位</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Unit Name (User Request: 單位名稱修改機制) -->
+  <div class="modal-overlay" id="modalEditUnit">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>修改單位名稱</h3>
+        <button class="modal-close" onclick="closeModal('modalEditUnit')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>單位名稱 (Unit Name)</label>
+        <input type="text" id="editUnitNameInput" class="form-control" placeholder="輸入新的單位名稱">
+        <input type="hidden" id="editUnitIdTarget">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('modalEditUnit')">取消</button>
+        <button class="btn btn-primary" onclick="saveEditUnitName()">儲存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add / Edit Defect (User Request: 公司必填、瑕疵名可選、Defect可修改) -->
+  <div class="modal-overlay" id="modalDefectForm">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalDefectFormTitle">新增 Defect 瑕疵</h3>
+        <button class="modal-close" onclick="closeModal('modalDefectForm')">&times;</button>
+      </div>
+
+      <input type="hidden" id="defectFormEditId">
+
+      <!-- Subcontractor (REQUIRED!) -->
+      <div class="form-group" style="border-left: 3px solid var(--danger); padding-left: 10px;">
+        <label>所屬公司 / 分判商 (Company / Subcontractor) <span style="color:var(--danger); font-weight:bold;">* 必填</span></label>
+        <input type="text" id="inputSubcontractor" class="form-control" placeholder="請輸入或點選下方所屬公司 (必填)">
+        
+        <div class="tag-manager-box">
+          <div class="tag-header">
+            <span>常用公司固定選項 (點擊填入，點擊 &times; 刪除選項)</span>
+          </div>
+          <div class="quick-tags" id="presetSubconTagsContainer"></div>
+          <div class="tag-input-row">
+            <input type="text" id="newSubconTagInput" class="tag-add-input" placeholder="新增公司固定選項 (如: 德記木門)">
+            <button class="btn btn-sm btn-outline" onclick="addNewSubconTag()">+ 新增選項</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Defect Name (OPTIONAL!) -->
+      <div class="form-group">
+        <label>瑕疵名稱 (Defect Name) <span style="color:var(--text-muted); font-weight:normal;">(可留空，未填寫將顯示為一般瑕疵)</span></label>
+        <input type="text" id="inputDefectName" class="form-control" placeholder="可選填，或點選下方固定瑕疵選項">
+        
+        <div class="tag-manager-box">
+          <div class="tag-header">
+            <span>常用瑕疵固定選項 (點擊填入，點擊 &times; 刪除選項)</span>
+          </div>
+          <div class="quick-tags" id="presetDefectTagsContainer"></div>
+          <div class="tag-input-row">
+            <input type="text" id="newDefectTagInput" class="tag-add-input" placeholder="新增瑕疵固定選項 (如: 門鎖鬆動)">
+            <button class="btn btn-sm btn-outline" onclick="addNewDefectTag()">+ 新增選項</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photos -->
+      <div class="form-group">
+        <label>現場相片 (Photos)</label>
+        <div class="media-btn-grid">
+          <label class="media-upload-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>📷 即時調用相機拍攝</span>
+            <input type="file" id="cameraPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(this)">
+          </label>
+
+          <label class="media-upload-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>🖼️ 從相簿選擇相片 (可多選)</span>
+            <input type="file" id="galleryPhotoInput" accept="image/*" multiple style="display:none;" onchange="handlePhotoUpload(this)">
+          </label>
+        </div>
+        <div id="photoPreviewBox" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;"></div>
+      </div>
+
+      <!-- Videos -->
+      <div class="form-group">
+        <label>巡查影片 (Videos)</label>
+        <div class="media-btn-grid" style="margin-bottom:8px;">
+          <label class="media-upload-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span>🎥 即時現場拍片錄影</span>
+            <input type="file" id="cameraVideoInput" accept="video/*" capture="environment" style="display:none;" onchange="handleVideoUpload(this)">
+          </label>
+
+          <label class="media-upload-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+            <span>📁 從本機選取影片</span>
+            <input type="file" id="galleryVideoInput" accept="video/*" style="display:none;" onchange="handleVideoUpload(this)">
+          </label>
+        </div>
+        <div id="videoStatusBadge" style="font-size:0.8rem; color:var(--primary); margin-bottom:6px; display:none;"></div>
+        <input type="text" id="inputUnitVideo" class="form-control" placeholder="或手動輸入影片雲端網址 (例如: https://videos.dlp-site.com/t1-9f-01.mp4)">
+      </div>
+
+      <div class="form-group">
+        <label>執修狀態</label>
+        <select id="selectDefectStatus" class="form-control">
+          <option value="待執修" selected>待執修 (Pending)</option>
+          <option value="已完成">已完成 (Rectified)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>位置具體細節 / 備註說明 (Remark)</label>
+        <textarea id="inputDefectRemark" class="form-control" rows="2" placeholder="例如: 客廁洗手盆左下方磁磚空鼓約 150x200mm"></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('modalDefectForm')">取消</button>
+        <button class="btn btn-primary" onclick="saveDefectFormSubmit()">確認保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Export Excel -->
+  <div class="modal-overlay" id="modalExport">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3>匯出 Excel 執修對數報表</h3>
+        <button class="modal-close" onclick="closeModal('modalExport')">&times;</button>
+      </div>
+      
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+        匯出試算表包含<strong>各公司瑕疵總數、待執修數量、已完成數量與完成率</strong>：
+      </p>
+
+      <div class="radio-option-card selected" id="optModeA" onclick="selectExportMode('A')">
+        <input type="radio" name="exportMode" value="A" checked style="margin-top:4px;">
+        <div>
+          <strong style="color:var(--text); font-size:0.95rem;">模式 A：簡易匯總對數表 (Summary Only)</strong>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+            包含欄位：座別 | 樓層 | 單位 | 瑕疵項目 | 所屬公司 | 狀態 | 備註。<br>
+            <strong>底部附帶：按分判商統計【總數 | 待修數 | 完成數 | 完成率%】。</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="radio-option-card" id="optModeB" onclick="selectExportMode('B')">
+        <input type="radio" name="exportMode" value="B" style="margin-top:4px;">
+        <div>
+          <strong style="color:var(--text); font-size:0.95rem;">模式 B：詳細查驗清單 (Detail Report with Media)</strong>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+            每筆瑕疵單獨成行，方便師傅按單位執修簽名驗收。
+          </p>
+          <div style="margin-top:8px; display:flex; gap:12px; font-size:0.8rem;">
+            <label><input type="checkbox" id="chkIncludeUnits" checked> 匯出單位清單</label>
+            <label><input type="checkbox" id="chkIncludeThumbnails" checked> 包含相片縮圖</label>
+            <label><input type="checkbox" id="chkIncludeVideoLinks" checked> 包含影片連結</label>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <span style="font-size:0.85rem; font-weight:600;">報表即時預覽：</span>
+        <div class="excel-preview-box" style="border:1px solid #cbd5e1; border-radius:6px; overflow-x:auto; max-height:240px; margin-top:8px;">
+          <table class="data-table" id="previewTable"></table>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+        <span style="font-size:0.8rem; color:var(--text-muted);">標準 Excel (XLS) 格式</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" onclick="closeModal('modalExport')">取消</button>
+          <button class="btn btn-accent" onclick="executeExcelExport()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            立即生成並下載 Excel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Cloud Sync & Collaboration -->
+  <div class="modal-overlay" id="modalCloudSync">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>☁️ 雲端數據同步與同事協同管理</h3>
+        <button class="modal-close" onclick="closeModal('modalCloudSync')">&times;</button>
+      </div>
+
+      <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
+        為了解決工程地盤無網絡/弱網問題，本系統支援<strong>無縫離線封包分享</strong>與<strong>多位工程師數據合併</strong>：
+      </div>
+
+      <div class="card" style="padding:14px; margin-bottom:12px; background:#f8fafc;">
+        <div style="font-weight:700; font-size:0.95rem; margin-bottom:4px;">1. 打包分享給同事 (Export Data)</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
+          將當前所有 Tower (T1/T2/T3/T5)、樓層、單位與瑕疵數據導出為單一工程封包，可透過 WhatsApp / AirDrop / Google Drive 傳送給同事。
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="exportDataPackage()">
+          📦 下載團隊共享巡查封包 (.json)
+        </button>
+      </div>
+
+      <div class="card" style="padding:14px; margin-bottom:12px; background:#f8fafc;">
+        <div style="font-weight:700; font-size:0.95rem; margin-bottom:4px;">2. 匯入合併同事的巡查數據 (Import & Merge)</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
+          選取同事發送給您的巡查封包，系統會自動比對並智慧合併新增的單位與瑕疵記錄。
+        </div>
+        <input type="file" id="importJsonFileInput" accept=".json" style="display:none;" onchange="handleImportJson(this)">
+        <button class="btn btn-accent btn-sm" onclick="document.getElementById('importJsonFileInput').click()">
+          📥 讀取並合併同事的數據封包
+        </button>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+        <button class="btn btn-primary" onclick="closeModal('modalCloudSync')">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="modal-overlay" id="imageLightboxModal" onclick="closeModal('imageLightboxModal')">
+    <div style="max-width:90%; max-height:90%; text-align:center;">
+      <img id="lightboxImg" src="" alt="Defect Photo">
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastNotification">
+    <span>✓</span>
+    <span id="toastText">已自動儲存</span>
+  </div>
+
+  <script>
+    // ==========================================================================
+    // 1. DATA MODELS & INITIAL STATE (BLANK INITIAL STATE, 0 DEFECTS!)
+    // ==========================================================================
+
+    const STORAGE_KEY = "HENG_WAI_BSC_DLP_DATA_V7";
+
+    const SUPPORTED_TOWERS = ["T1", "T2", "T3", "T5"];
+
+    // Default units per tower requested by user:
+    // T1 and T5: AA, AB, AC, AD, AE, BA, BB, BC, BD, BE, BF, BG (12 units)
+    // T2 and T3: AA, AB, AC, AD, AE, BA, BB, BC, BD, BE, BF (11 units)
+    const TOWER_DEFAULT_UNITS = {
+      "T1": ["AA", "AB", "AC", "AD", "AE", "BA", "BB", "BC", "BD", "BE", "BF", "BG"],
+      "T5": ["AA", "AB", "AC", "AD", "AE", "BA", "BB", "BC", "BD", "BE", "BF", "BG"],
+      "T2": ["AA", "AB", "AC", "AD", "AE", "BA", "BB", "BC", "BD", "BE", "BF"],
+      "T3": ["AA", "AB", "AC", "AD", "AE", "BA", "BB", "BC", "BD", "BE", "BF"]
+    };
+
+    // User requested preset unit tags:
+    const DEFAULT_PRESET_UNITS = [
+      "AA", "AB", "AC", "AD", "AE", "BA", "BB", "BC", "BD", "BE", "BF", "BG"
+    ];
+
+    const DEFAULT_PRESET_DEFECTS = [
+      "執修完成", "喉坑空鼓", "疑問", "非BSC", "待補膠執色", 
+      "小崩爛", "待換瓦", "空鼓", "唧膠（G M）", "唧膠(啓光)", 
+      "清潔", "倒科", "掃口", "outstanding", "雜項"
+    ];
+
+    const DEFAULT_PRESET_SUBCONS = [
+      "BSC", "億通", "卓裕", "啟光", "Glass Magic", 
+      "鈦城", "聯益", "Sun Power", "Top Goal", "非BSC"
+    ];
+
+    // Blank on initial open: 0 defects!
+    function generateCleanInitialData() {
+      // Create clean floors: T1 has 9F, with auto-generated units, but ZERO defects!
+      const initialLocations = [
+        { id: "loc-t1-9f", tower: "T1", floor: "9F", createdAt: Date.now() }
+      ];
+
+      const initialUnits = [];
+      TOWER_DEFAULT_UNITS["T1"].forEach((uName, idx) => {
+        initialUnits.push({
+          id: `unit-t1-9f-${idx}`,
+          locationId: "loc-t1-9f",
+          unitName: uName,
+          createdAt: Date.now() + idx
+        });
+      });
+
+      return {
+        presetDefectNames: DEFAULT_PRESET_DEFECTS,
+        presetSubcontractors: DEFAULT_PRESET_SUBCONS,
+        presetUnitNames: DEFAULT_PRESET_UNITS,
+        locations: initialLocations,
+        units: initialUnits,
+        defects: [] // 0 DEFECTS PRESET! Completely blank!
+      };
+    }
+
+    let appState = {
+      data: null,
+      currentTower: "T1",
+      currentLocationId: null,
+      currentUnitId: null,
+      activeFloorTab: "units",
+      selectedExportMode: "A",
+      tempUploadedPhotos: [],
+      tempUploadedVideo: ""
+    };
+
+    function loadState() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          appState.data = JSON.parse(stored);
+          if (!appState.data.presetDefectNames) appState.data.presetDefectNames = [...DEFAULT_PRESET_DEFECTS];
+          if (!appState.data.presetSubcontractors) appState.data.presetSubcontractors = [...DEFAULT_PRESET_SUBCONS];
+          if (!appState.data.presetUnitNames) appState.data.presetUnitNames = [...DEFAULT_PRESET_UNITS];
+          if (!appState.data.locations) appState.data.locations = [];
+          if (!appState.data.units) appState.data.units = [];
+          if (!appState.data.defects) appState.data.defects = [];
+        } catch(e) {
+          appState.data = generateCleanInitialData();
+        }
+      } else {
+        appState.data = generateCleanInitialData();
+        saveState(false);
+      }
+    }
+
+    function saveState(notify = true) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.data));
+      if (notify) {
+        showToast("已自動儲存至本機");
+      }
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toastNotification");
+      const toastText = document.getElementById("toastText");
+      if (toast && toastText) {
+        toastText.textContent = text;
+        toast.style.display = "flex";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 1800);
+      }
+    }
+
+    function resetSampleData() {
+      if (confirm("確定要重置為空白起始狀態嗎？所有自定義樓層、單位與瑕疵記錄將清空（0 瑕疵）。")) {
+        appState.data = generateCleanInitialData();
+        appState.currentTower = "T1";
+        saveState();
+        showViewFloors();
+      }
+    }
+
+    // ==========================================================================
+    // 2. TAG MANAGEMENT
+    // ==========================================================================
+
+    function renderPresetDefectTags() {
+      const box = document.getElementById("presetDefectTagsContainer");
+      box.innerHTML = "";
+      appState.data.presetDefectNames.forEach((tag, idx) => {
+        const el = document.createElement("span");
+        el.className = "quick-tag";
+        el.innerHTML = `
+          <span class="tag-text" onclick="setDefectName('${escapeJsString(tag)}')">${tag}</span>
+          <span class="tag-del-btn" onclick="deleteDefectTag(${idx}, event)" title="刪除此選項">&times;</span>
+        `;
+        box.appendChild(el);
+      });
+    }
+
+    function setDefectName(val) { document.getElementById("inputDefectName").value = val; }
+
+    function addNewDefectTag() {
+      const input = document.getElementById("newDefectTagInput");
+      const val = input.value.trim();
+      if (!val) return;
+      if (!appState.data.presetDefectNames.includes(val)) {
+        appState.data.presetDefectNames.push(val);
+        saveState();
+        renderPresetDefectTags();
+        setDefectName(val);
+      }
+      input.value = "";
+    }
+
+    function deleteDefectTag(idx, e) {
+      e.stopPropagation();
+      const removed = appState.data.presetDefectNames[idx];
+      if (confirm(`確定刪除固定瑕疵選項【${removed}】嗎？`)) {
+        appState.data.presetDefectNames.splice(idx, 1);
+        saveState();
+        renderPresetDefectTags();
+      }
+    }
+
+    function renderPresetSubconTags() {
+      const box = document.getElementById("presetSubconTagsContainer");
+      box.innerHTML = "";
+      appState.data.presetSubcontractors.forEach((tag, idx) => {
+        const el = document.createElement("span");
+        el.className = "quick-tag";
+        el.innerHTML = `
+          <span class="tag-text" onclick="setSubcon('${escapeJsString(tag)}')">${tag}</span>
+          <span class="tag-del-btn" onclick="deleteSubconTag(${idx}, event)" title="刪除此選項">&times;</span>
+        `;
+        box.appendChild(el);
+      });
+    }
+
+    function setSubcon(val) { document.getElementById("inputSubcontractor").value = val; }
+
+    function addNewSubconTag() {
+      const input = document.getElementById("newSubconTagInput");
+      const val = input.value.trim();
+      if (!val) return;
+      if (!appState.data.presetSubcontractors.includes(val)) {
+        appState.data.presetSubcontractors.push(val);
+        saveState();
+        renderPresetSubconTags();
+        setSubcon(val);
+      }
+      input.value = "";
+    }
+
+    function deleteSubconTag(idx, e) {
+      e.stopPropagation();
+      const removed = appState.data.presetSubcontractors[idx];
+      if (confirm(`確定刪除公司選項【${removed}】嗎？`)) {
+        appState.data.presetSubcontractors.splice(idx, 1);
+        saveState();
+        renderPresetSubconTags();
+      }
+    }
+
+    function renderPresetUnitTags() {
+      const box = document.getElementById("presetUnitTagsContainer");
+      box.innerHTML = "";
+      appState.data.presetUnitNames.forEach((tag, idx) => {
+        const el = document.createElement("span");
+        el.className = "quick-tag";
+        el.innerHTML = `
+          <span class="tag-text" onclick="setUnitName('${escapeJsString(tag)}')">${tag}</span>
+          <span class="tag-del-btn" onclick="deleteUnitTag(${idx}, event)" title="刪除此選項">&times;</span>
+        `;
+        box.appendChild(el);
+      });
+    }
+
+    function setUnitName(val) { document.getElementById("inputUnitName").value = val; }
+
+    function addNewUnitTag() {
+      const input = document.getElementById("newUnitTagInput");
+      const val = input.value.trim();
+      if (!val) return;
+      if (!appState.data.presetUnitNames.includes(val)) {
+        appState.data.presetUnitNames.push(val);
+        saveState();
+        renderPresetUnitTags();
+        setUnitName(val);
+      }
+      input.value = "";
+    }
+
+    function deleteUnitTag(idx, e) {
+      e.stopPropagation();
+      const removed = appState.data.presetUnitNames[idx];
+      if (confirm(`確定刪除常用單位選項【${removed}】嗎？`)) {
+        appState.data.presetUnitNames.splice(idx, 1);
+        saveState();
+        renderPresetUnitTags();
+      }
+    }
+
+    function escapeJsString(str) { return str.replace(/'/g, "\\'"); }
+
+    // ==========================================================================
+    // 3. NAVIGATION & ROUTING
+    // ==========================================================================
+
+    function showViewFloors() {
+      appState.currentLocationId = null;
+      appState.currentUnitId = null;
+      document.getElementById("viewFloors").style.display = "block";
+      document.getElementById("viewFloorDetail").style.display = "none";
+      document.getElementById("viewUnitDetail").style.display = "none";
+      renderBreadcrumbs();
+      renderTowerTabs();
+      renderFloorList();
+    }
+
+    function showViewFloorDetail(locationId) {
+      appState.currentLocationId = locationId;
+      appState.currentUnitId = null;
+      document.getElementById("viewFloors").style.display = "none";
+      document.getElementById("viewFloorDetail").style.display = "block";
+      document.getElementById("viewUnitDetail").style.display = "none";
+      renderBreadcrumbs();
+      renderFloorDashboardAndContent();
+    }
+
+    function showViewUnitDetail(unitId) {
+      appState.currentUnitId = unitId;
+      document.getElementById("viewFloors").style.display = "none";
+      document.getElementById("viewFloorDetail").style.display = "none";
+      document.getElementById("viewUnitDetail").style.display = "block";
+      renderBreadcrumbs();
+      renderUnitDetailAndDefects();
+    }
+
+    function renderBreadcrumbs() {
+      const nav = document.getElementById("breadcrumbsNav");
+      let html = `<span onclick="showViewFloors()">首頁 (${appState.currentTower} 座)</span>`;
+
+      if (appState.currentLocationId) {
+        const loc = appState.data.locations.find(l => l.id === appState.currentLocationId);
+        const locName = loc ? `${loc.tower} - ${loc.floor}` : "樓層";
+        html += ` <svg viewBox="0 0 20 20"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg> `;
+        
+        if (appState.currentUnitId) {
+          html += `<span onclick="showViewFloorDetail('${loc.id}')">${locName} 巡查工作台</span>`;
+          const unit = appState.data.units.find(u => u.id === appState.currentUnitId);
+          const unitTitle = unit ? `【${unit.unitName}】` : "單位";
+          html += ` <svg viewBox="0 0 20 20"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg> `;
+          html += `<span class="current">${unitTitle} 執修清單</span>`;
+        } else {
+          html += `<span class="current">${locName} 巡查工作台</span>`;
+        }
+      }
+      nav.innerHTML = html;
+    }
+
+    // ==========================================================================
+    // 4. TOWER & FLOOR (T1, T2, T3, T5 & AUTO UNIT GENERATION)
+    // ==========================================================================
+
+    function renderTowerTabs() {
+      const bar = document.getElementById("towerBarContainer");
+      bar.innerHTML = "";
+
+      SUPPORTED_TOWERS.forEach(tower => {
+        const towerLocs = appState.data.locations.filter(l => l.tower === tower);
+        const locIds = towerLocs.map(l => l.id);
+        const towerUnits = appState.data.units.filter(u => locIds.includes(u.locationId));
+        const unitIds = towerUnits.map(u => u.id);
+        const towerDefects = appState.data.defects.filter(d => unitIds.includes(d.unitId));
+
+        const card = document.createElement("div");
+        card.className = `tower-card-btn ${appState.currentTower === tower ? 'active' : ''}`;
+        card.onclick = () => selectTower(tower);
+        card.innerHTML = `
+          <div class="tower-name">${tower} 座</div>
+          <div class="tower-desc">${towerLocs.length} 個樓層 | ${towerDefects.length} 項瑕疵</div>
+          <span class="tower-badge-count">${towerLocs.length} 樓層</span>
+        `;
+        bar.appendChild(card);
+      });
+
+      document.getElementById("currentTowerSectionTitle").textContent = `${appState.currentTower} 座樓層清單`;
+    }
+
+    function selectTower(tower) {
+      appState.currentTower = tower;
+      renderTowerTabs();
+      renderFloorList();
+      renderBreadcrumbs();
+    }
+
+    function renderFloorList() {
+      const container = document.getElementById("floorListContainer");
+      container.innerHTML = "";
+
+      const towerLocs = appState.data.locations.filter(l => l.tower === appState.currentTower);
+
+      if (towerLocs.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:40px; color:var(--text-muted);">
+            <p style="font-size:1.1rem; margin-bottom:12px;">${appState.currentTower} 座尚未建立任何樓層</p>
+            <p style="font-size:0.85rem; margin-bottom:16px;">點擊下方按鈕新增樓層，系統將自動為該樓層產生預設單位（初始 0 瑕疵）。</p>
+            <button class="btn btn-primary" onclick="openNewFloorModal()">為 ${appState.currentTower} 新增樓層</button>
+          </div>
+        `;
+        return;
+      }
+
+      towerLocs.forEach(loc => {
+        const floorUnits = appState.data.units.filter(u => u.locationId === loc.id);
+        const unitIds = floorUnits.map(u => u.id);
+        const floorDefects = appState.data.defects.filter(d => unitIds.includes(d.unitId));
+
+        const totalCount = floorDefects.length;
+        const pendingCount = floorDefects.filter(d => d.status === "待執修").length;
+        const doneCount = floorDefects.filter(d => d.status === "已完成").length;
+
+        const card = document.createElement("div");
+        card.className = "floor-card";
+        card.onclick = () => showViewFloorDetail(loc.id);
+        card.innerHTML = `
+          <div class="floor-card-top">
+            <div>
+              <div class="floor-tower">${loc.tower} 座</div>
+              <div class="floor-badge">${loc.floor}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="floor-del-btn" onclick="deleteFloor('${loc.id}', event)" title="刪除此樓層">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+              <span class="btn btn-sm btn-outline" style="border-radius:20px;">進入巡查 &rarr;</span>
+            </div>
+          </div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:0.85rem;">
+            <div>
+              <span style="color:var(--text-muted);">單位數：</span>
+              <strong>${floorUnits.length}</strong> 個
+            </div>
+            <div>
+              <span style="color:var(--text-muted);">總瑕疵：</span>
+              <strong>${totalCount}</strong> 個
+            </div>
+            <div>
+              <span style="color:var(--danger);">待執修：</span>
+              <strong style="color:var(--danger);">${pendingCount}</strong>
+            </div>
+            <div>
+              <span style="color:var(--success);">已完成：</span>
+              <strong style="color:var(--success);">${doneCount}</strong>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function deleteFloor(locationId, event) {
+      event.stopPropagation();
+      const loc = appState.data.locations.find(l => l.id === locationId);
+      if (!loc) return;
+      if (confirm(`確定要刪除【${loc.tower} - ${loc.floor}】嗎？\n該樓層下的所有單位及瑕疵記錄將一併刪除。`)) {
+        const floorUnits = appState.data.units.filter(u => u.locationId === locationId);
+        const unitIds = floorUnits.map(u => u.id);
+        appState.data.defects = appState.data.defects.filter(d => !unitIds.includes(d.unitId));
+        appState.data.units = appState.data.units.filter(u => u.locationId !== locationId);
+        appState.data.locations = appState.data.locations.filter(l => l.id !== locationId);
+        saveState();
+        renderTowerTabs();
+        renderFloorList();
+      }
+    }
+
+    function openNewFloorModal() {
+      document.getElementById("inputNewTower").value = appState.currentTower;
+      document.getElementById("inputNewFloor").value = "";
+      openModal("modalNewFloor");
+    }
+
+    // Floor Creation with Auto-Generated Units according to Tower!
+    function saveNewFloor() {
+      const tower = document.getElementById("inputNewTower").value.trim() || appState.currentTower;
+      const floor = document.getElementById("inputNewFloor").value.trim();
+      if (!floor) {
+        alert("請輸入樓層編號！");
+        return;
+      }
+
+      // Check if this tower + floor already exists
+      const exists = appState.data.locations.some(l => l.tower === tower && l.floor.toUpperCase() === floor.toUpperCase());
+      if (exists) {
+        alert(`【${tower} 座】已存在【${floor}】樓層，請勿重複建立！`);
+        return;
+      }
+
+      const newLocId = "loc-" + Date.now();
+      const newLoc = {
+        id: newLocId,
+        tower: tower,
+        floor: floor,
+        createdAt: Date.now()
+      };
+      appState.data.locations.push(newLoc);
+
+      // User requirement: T1 & T5 auto-generate AA~BG (12 units); T2 & T3 auto-generate AA~BF (11 units)
+      const defaultUnitsList = TOWER_DEFAULT_UNITS[tower] || TOWER_DEFAULT_UNITS["T1"];
+      defaultUnitsList.forEach((uName, idx) => {
+        appState.data.units.push({
+          id: `unit-${Date.now()}-${idx}`,
+          locationId: newLocId,
+          unitName: uName,
+          createdAt: Date.now() + idx
+        });
+      });
+
+      appState.currentTower = tower;
+      saveState();
+      closeModal("modalNewFloor");
+      renderTowerTabs();
+      renderFloorList();
+      alert(`已為【${tower} 座 ${floor}】成功建立並自動生成 ${defaultUnitsList.length} 個單位（初始 0 瑕疵）！`);
+    }
+
+    // ==========================================================================
+    // 5. UNIT MANAGEMENT (DUPLICATE CHECK, RENAME / EDIT, DELETE)
+    // ==========================================================================
+
+    function openNewUnitModal() {
+      document.getElementById("inputUnitName").value = "";
+      renderPresetUnitTags();
+      openModal("modalNewUnit");
+    }
+
+    // User requirement: Duplicate unit check on the same floor!
+    function saveNewUnit() {
+      const name = document.getElementById("inputUnitName").value.trim();
+      if (!name) {
+        alert("請輸入或選擇單位名稱！");
+        return;
+      }
+
+      // Check for duplicates on THIS floor!
+      const floorUnits = appState.data.units.filter(u => u.locationId === appState.currentLocationId);
+      const isDuplicate = floorUnits.some(u => u.unitName.toUpperCase() === name.toUpperCase());
+      if (isDuplicate) {
+        alert(`【重複提示】該樓層已存在單位【${name}】，同一樓層不可建立重複單位！`);
+        return;
+      }
+
+      if (!appState.data.presetUnitNames.includes(name)) {
+        appState.data.presetUnitNames.push(name);
+      }
+
+      const newUnit = {
+        id: "unit-" + Date.now(),
+        locationId: appState.currentLocationId,
+        unitName: name,
+        createdAt: Date.now()
+      };
+
+      appState.data.units.push(newUnit);
+      saveState();
+      closeModal("modalNewUnit");
+      renderFloorDashboardAndContent();
+    }
+
+    // User requirement: Edit Unit Name feature
+    function openEditUnitModal(unitId, event) {
+      if (event) event.stopPropagation();
+      const unit = appState.data.units.find(u => u.id === unitId);
+      if (!unit) return;
+
+      document.getElementById("editUnitIdTarget").value = unitId;
+      document.getElementById("editUnitNameInput").value = unit.unitName;
+      openModal("modalEditUnit");
+    }
+
+    function saveEditUnitName() {
+      const unitId = document.getElementById("editUnitIdTarget").value;
+      const newName = document.getElementById("editUnitNameInput").value.trim();
+      if (!newName) {
+        alert("單位名稱不可為空！");
+        return;
+      }
+
+      const unit = appState.data.units.find(u => u.id === unitId);
+      if (!unit) return;
+
+      // Duplicate check against other units on the same floor
+      const otherUnits = appState.data.units.filter(u => u.locationId === unit.locationId && u.id !== unitId);
+      const isDuplicate = otherUnits.some(u => u.unitName.toUpperCase() === newName.toUpperCase());
+      if (isDuplicate) {
+        alert(`【重複提示】該樓層已存在單位【${newName}】，不可修改為重複名稱！`);
+        return;
+      }
+
+      unit.unitName = newName;
+      saveState();
+      closeModal("modalEditUnit");
+
+      if (appState.currentUnitId) {
+        renderUnitDetailAndDefects();
+      } else {
+        renderFloorDashboardAndContent();
+      }
+      showToast("單位名稱已修改");
+    }
+
+    function deleteUnit(unitId, event) {
+      if (event) event.stopPropagation();
+      const unit = appState.data.units.find(u => u.id === unitId);
+      if (!unit) return;
+      if (confirm(`確定刪除單位【${unit.unitName}】嗎？\n該單位下的所有瑕疵記錄將一併刪除。`)) {
+        appState.data.defects = appState.data.defects.filter(d => d.unitId !== unitId);
+        appState.data.units = appState.data.units.filter(u => u.id !== unitId);
+        saveState();
+        renderFloorDashboardAndContent();
+      }
+    }
+
+    // ==========================================================================
+    // 6. FLOOR DASHBOARD & DUAL TAB VIEW
+    // ==========================================================================
+
+    function renderFloorDashboardAndContent() {
+      const loc = appState.data.locations.find(l => l.id === appState.currentLocationId);
+      if (!loc) return;
+
+      document.getElementById("currentFloorTitle").textContent = `${loc.tower} 座 - ${loc.floor} 巡查工作台`;
+
+      const floorUnits = appState.data.units.filter(u => u.locationId === loc.id);
+      const unitIds = floorUnits.map(u => u.id);
+      const floorDefects = appState.data.defects.filter(d => unitIds.includes(d.unitId));
+
+      const totalDefects = floorDefects.length;
+      const totalPending = floorDefects.filter(d => d.status === "待執修").length;
+      const totalDone = floorDefects.filter(d => d.status === "已完成").length;
+
+      // Group by Subcontractor: Total, Pending, Completed
+      const subconStats = {};
+      floorDefects.forEach(d => {
+        const sub = d.subcontractor || "未指派公司";
+        if (!subconStats[sub]) {
+          subconStats[sub] = { total: 0, pending: 0, completed: 0 };
+        }
+        subconStats[sub].total += 1;
+        if (d.status === "已完成") {
+          subconStats[sub].completed += 1;
+        } else {
+          subconStats[sub].pending += 1;
+        }
+      });
+
+      const statsGrid = document.getElementById("floorStatsGrid");
+      let subconCardsHtml = "";
+      Object.entries(subconStats).forEach(([name, stat]) => {
+        const pct = stat.total > 0 ? Math.round((stat.completed / stat.total) * 100) : 0;
+        subconCardsHtml += `
+          <div class="subcon-stat-card">
+            <div class="subcon-stat-header">
+              <span class="subcon-name-badge">${name}</span>
+              <span class="subcon-total-badge">總數: ${stat.total}</span>
+            </div>
+            <div class="subcon-stat-numbers">
+              <span class="subcon-stat-pending">待執修: ${stat.pending}</span>
+              <span class="subcon-stat-done">已完成: ${stat.completed} (${pct}%)</span>
+            </div>
+          </div>
+        `;
+      });
+
+      statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-title">${loc.tower} 座 ${loc.floor} 全層統計</div>
+          <div class="stat-value">${floorUnits.length} <span style="font-size:0.95rem; font-weight:normal; color:var(--text-muted);">單位</span> / ${totalDefects} <span style="font-size:0.95rem; font-weight:normal; color:var(--text-muted);">瑕疵</span></div>
+          <div class="stat-sub">待執修: <span style="color:var(--danger); font-weight:bold;">${totalPending}</span> | 已完成: <span style="color:var(--success); font-weight:bold;">${totalDone}</span></div>
+        </div>
+
+        <div class="stat-card subcon" style="grid-column: span 2;">
+          <div class="stat-title">所屬分判商責任統計看板 (總數、待執修與已完成數量)</div>
+          <div class="subcon-badge-list">
+            ${subconCardsHtml || '<span style="font-size:0.8rem; color:var(--text-muted);">目前無瑕疵記錄 (0 Defect)</span>'}
+          </div>
+        </div>
+      `;
+
+      document.getElementById("badgeUnitsCount").textContent = floorUnits.length;
+      document.getElementById("badgeAllDefectsCount").textContent = totalDefects;
+
+      const filterSelect = document.getElementById("filterSubconSelect");
+      const currentSelectedSubcon = filterSelect.value;
+      filterSelect.innerHTML = `<option value="">全部公司 / 分判商</option>`;
+      Object.keys(subconStats).forEach(name => {
+        filterSelect.innerHTML += `<option value="${name}" ${name === currentSelectedSubcon ? 'selected' : ''}>${name} (總數 ${subconStats[name].total} | 完成 ${subconStats[name].completed})</option>`;
+      });
+
+      if (appState.activeFloorTab === "units") {
+        renderFloorUnitsGrid();
+      } else {
+        renderAllDefectsTable();
+      }
+    }
+
+    function switchFloorTab(tab) {
+      appState.activeFloorTab = tab;
+      const tabUnitsBtn = document.getElementById("tabUnitsBtn");
+      const tabAllDefectsBtn = document.getElementById("tabAllDefectsBtn");
+      const subViewUnits = document.getElementById("subViewUnits");
+      const subViewAllDefects = document.getElementById("subViewAllDefects");
+
+      if (tab === "units") {
+        tabUnitsBtn.classList.add("active");
+        tabAllDefectsBtn.classList.remove("active");
+        subViewUnits.style.display = "block";
+        subViewAllDefects.style.display = "none";
+        renderFloorUnitsGrid();
+      } else {
+        tabAllDefectsBtn.classList.add("active");
+        tabUnitsBtn.classList.remove("active");
+        subViewUnits.style.display = "none";
+        subViewAllDefects.style.display = "block";
+        renderAllDefectsTable();
+      }
+    }
+
+    function renderFloorUnitsGrid() {
+      const container = document.getElementById("floorUnitsContainer");
+      container.innerHTML = "";
+
+      const floorUnits = appState.data.units.filter(u => u.locationId === appState.currentLocationId);
+
+      if (floorUnits.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:40px; color:var(--text-muted);">
+            <p style="font-size:1.1rem; margin-bottom:12px;">該樓層尚無單位</p>
+            <button class="btn btn-primary" onclick="openNewUnitModal()">立即新增單位</button>
+          </div>
+        `;
+        return;
+      }
+
+      floorUnits.forEach(unit => {
+        const unitDefects = appState.data.defects.filter(d => d.unitId === unit.id);
+        const count = unitDefects.length;
+        const pending = unitDefects.filter(d => d.status === "待執修").length;
+        const done = unitDefects.filter(d => d.status === "已完成").length;
+
+        const subcons = Array.from(new Set(unitDefects.map(d => d.subcontractor)));
+        const defectNames = unitDefects.map(d => d.defectName || "(未註明瑕疵)").slice(0, 3).join("、");
+        const extraText = count > 3 ? ` 等共 ${count} 項瑕疵` : "";
+
+        const card = document.createElement("div");
+        card.className = "unit-box-card";
+        card.onclick = () => showViewUnitDetail(unit.id);
+
+        card.innerHTML = `
+          <div>
+            <div class="unit-box-header">
+              <div class="unit-box-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span>${unit.unitName}</span>
+              </div>
+              <div class="unit-box-actions">
+                <button class="unit-action-btn" onclick="openEditUnitModal('${unit.id}', event)" title="修改單位名稱">
+                  ✏️ 修改
+                </button>
+                <button class="unit-action-btn del" onclick="deleteUnit('${unit.id}', event)" title="刪除此單位">
+                  🗑️
+                </button>
+              </div>
+            </div>
+
+            <div class="unit-box-stats">
+              <span>瑕疵: <strong>${count}</strong></span>
+              <span style="color:var(--danger);">待修: <strong>${pending}</strong></span>
+              <span style="color:var(--success);">完成: <strong>${done}</strong></span>
+            </div>
+
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">責任公司：</div>
+            <div class="unit-box-subcons">
+              ${subcons.length > 0 ? subcons.map(s => `<span class="company-pill">${s}</span>`).join('') : '<span style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">尚無瑕疵 (0 Defect)</span>'}
+            </div>
+
+            <div class="unit-box-defects-preview">
+              ${count > 0 ? `瑕疵：${defectNames}${extraText}` : '<span style="color:var(--text-muted); font-style:italic;">點擊進入登記瑕疵</span>'}
+            </div>
+          </div>
+
+          <div class="unit-box-footer">
+            <span style="font-size:0.8rem; color:var(--primary); font-weight:600;">進入單位管理 &rarr;</span>
+            <span class="btn btn-sm btn-outline">+ 新增 Defect</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderAllDefectsTable() {
+      const table = document.getElementById("allDefectsTable");
+      const loc = appState.data.locations.find(l => l.id === appState.currentLocationId);
+      const floorStr = loc ? `${loc.tower} 座 ${loc.floor}` : "9F";
+
+      const floorUnits = appState.data.units.filter(u => u.locationId === appState.currentLocationId);
+      const unitMap = {};
+      floorUnits.forEach(u => { unitMap[u.id] = u.unitName; });
+
+      const unitIds = floorUnits.map(u => u.id);
+      let defects = appState.data.defects.filter(d => unitIds.includes(d.unitId));
+
+      const filterSubcon = document.getElementById("filterSubconSelect").value;
+      const filterStatus = document.getElementById("filterStatusSelect").value;
+      if (filterSubcon) {
+        defects = defects.filter(d => d.subcontractor === filterSubcon);
+      }
+      if (filterStatus) {
+        defects = defects.filter(d => d.status === filterStatus);
+      }
+
+      let th = `
+        <thead>
+          <tr>
+            <th style="width:50px;">序號</th>
+            <th>單位名稱</th>
+            <th>瑕疵項目 (Defect)</th>
+            <th>所屬公司 (Subcontractor)</th>
+            <th>現場相片</th>
+            <th>影片連結</th>
+            <th>執修狀態</th>
+            <th>具體備註</th>
+            <th style="width:110px;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+
+      if (defects.length === 0) {
+        table.innerHTML = th + `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-muted);">尚無瑕疵記錄 (0 Defect)</td></tr></tbody>`;
+        return;
+      }
+
+      let rows = "";
+      defects.forEach((d, index) => {
+        const uName = unitMap[d.unitId] || "未知單位";
+        const hasPhoto = d.photos && d.photos.length > 0;
+        const hasVideo = d.videos && d.videos.length > 0;
+        const isDone = d.status === "已完成";
+
+        let photoThumbHtml = "無";
+        if (hasPhoto) {
+          photoThumbHtml = `<img src="${d.photos[0]}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="openLightbox('${d.photos[0]}')" title="點擊放大">`;
+        }
+
+        let videoLinkHtml = "無";
+        if (hasVideo) {
+          videoLinkHtml = `<a href="${d.videos[0]}" target="_blank" style="color:var(--primary-light); font-weight:600;">播放</a>`;
+        }
+
+        rows += `
+          <tr>
+            <td align="center">${index + 1}</td>
+            <td><strong style="color:var(--primary); cursor:pointer;" onclick="showViewUnitDetail('${d.unitId}')">${uName}</strong></td>
+            <td><strong>${d.defectName ? '【' + d.defectName + '】' : '<span style="color:var(--text-muted);">(未註明瑕疵)</span>'}</strong></td>
+            <td><span class="company-pill">${d.subcontractor}</span></td>
+            <td>${photoThumbHtml}</td>
+            <td>${videoLinkHtml}</td>
+            <td>
+              <span class="status-badge ${isDone ? 'done' : 'pending'}" onclick="toggleDefectStatus('${d.id}')" title="點擊切換狀態">
+                ${isDone ? '✓ 已完成' : '⚠ 待執修'}
+              </span>
+            </td>
+            <td>${d.remark || '無'}</td>
+            <td>
+              <div style="display:flex; gap:4px;">
+                <button class="btn btn-outline btn-sm" onclick="openEditDefectModal('${d.id}')">編輯</button>
+                <button class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fecaca;" onclick="deleteDefect('${d.id}')">刪除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      table.innerHTML = th + rows + `</tbody>`;
+    }
+
+    // ==========================================================================
+    // 7. UNIT DETAIL & DEFECT MANAGEMENT (EDIT & DELETE DEFECTS)
+    // ==========================================================================
+
+    function renderUnitDetailAndDefects() {
+      const unit = appState.data.units.find(u => u.id === appState.currentUnitId);
+      if (!unit) return;
+
+      const loc = appState.data.locations.find(l => l.id === unit.locationId);
+      const unitDefects = appState.data.defects.filter(d => d.unitId === unit.id);
+      const count = unitDefects.length;
+      const pendingCount = unitDefects.filter(d => d.status === "待執修").length;
+      const doneCount = unitDefects.filter(d => d.status === "已完成").length;
+
+      const subcons = Array.from(new Set(unitDefects.map(d => d.subcontractor)));
+
+      const banner = document.getElementById("unitDetailBanner");
+      banner.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <span style="font-size:0.85rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-weight:600;">${loc ? loc.tower + ' 座 ' + loc.floor : ''}</span>
+              <button class="btn btn-sm btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="openEditUnitModal('${unit.id}')">✏️ 重新命名此單位</button>
+            </div>
+            <h2 style="font-size:1.45rem; font-weight:800; color:var(--text);">【${unit.unitName}】瑕疵與責任公司清單</h2>
+            <div style="margin-top:6px; font-size:0.85rem; color:var(--text-muted);">
+              涉及分判商公司：${subcons.length > 0 ? subcons.map(s => `<span class="company-pill">${s}</span>`).join(' ') : '尚無'}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.8rem; font-weight:800; color:var(--primary);">${count} <span style="font-size:1rem; font-weight:normal;">項 Defect</span></div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">
+              待執修: <strong style="color:var(--danger);">${pendingCount}</strong> | 
+              已完成: <strong style="color:var(--success);">${doneCount}</strong>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const grid = document.getElementById("unitDefectsContainer");
+      grid.innerHTML = "";
+
+      if (unitDefects.length === 0) {
+        grid.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:40px; color:var(--text-muted);">
+            <p style="font-size:1.05rem; margin-bottom:12px;">該單位目前無瑕疵記錄 (0 Defect)</p>
+            <p style="font-size:0.85rem; margin-bottom:16px;">點擊上方「新增此單位瑕疵」，填寫所屬公司（必填）與瑕疵名稱（可選）。</p>
+            <button class="btn btn-primary" onclick="openNewDefectModal()">立即新增 Defect</button>
+          </div>
+        `;
+        return;
+      }
+
+      unitDefects.forEach(defect => {
+        const card = document.createElement("div");
+        card.className = `defect-in-unit-card ${defect.status === '已完成' ? 'completed' : ''}`;
+
+        let mediaHtml = "";
+        if (defect.photos && defect.photos.length > 0) {
+          defect.photos.forEach(imgSrc => {
+            mediaHtml += `
+              <div class="media-thumb-container">
+                <img src="${imgSrc}" class="media-thumb" onclick="openLightbox('${imgSrc}')" title="點擊放大相片" alt="現場相片">
+              </div>
+            `;
+          });
+        }
+        if (defect.videos && defect.videos.length > 0) {
+          defect.videos.forEach(vUrl => {
+            mediaHtml += `
+              <a href="${vUrl}" target="_blank" class="media-video-badge" title="播放巡查影片">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <span>播放影片</span>
+              </a>
+            `;
+          });
+        }
+
+        const isDone = defect.status === "已完成";
+
+        card.innerHTML = `
+          <div>
+            <div class="defect-card-header">
+              <div>
+                <div class="defect-card-title">${defect.defectName ? '【' + defect.defectName + '】' : '<span style="color:var(--text-muted); font-size:0.95rem;">(未填寫瑕疵名稱)</span>'}</div>
+                <div style="margin-top:4px;">
+                  <span class="company-pill">所屬公司：${defect.subcontractor}</span>
+                </div>
+              </div>
+              <div class="status-badge ${isDone ? 'done' : 'pending'}" onclick="toggleDefectStatus('${defect.id}')" title="點擊切換狀態 (待執修 ↔ 已完成)">
+                <span>${isDone ? '✓ 已完成' : '⚠ 待執修'}</span>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              ${mediaHtml ? `<div class="unit-media-row">${mediaHtml}</div>` : '<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">(未附相片/影片)</div>'}
+            </div>
+
+            ${defect.remark ? `<div class="unit-remark" style="margin-top:8px;">${defect.remark}</div>` : ''}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid rgba(0,0,0,0.06); font-size:0.75rem; color:var(--text-muted);">
+            <span>登記時間: ${new Date(defect.createdAt).toLocaleDateString()}</span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-outline btn-sm" onclick="openEditDefectModal('${defect.id}')">✏️ 編輯</button>
+              <button class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fecaca;" onclick="deleteDefect('${defect.id}')">刪除</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function toggleDefectStatus(defectId) {
+      const d = appState.data.defects.find(item => item.id === defectId);
+      if (d) {
+        d.status = d.status === "待執修" ? "已完成" : "待執修";
+        saveState();
+        if (appState.currentUnitId) {
+          renderUnitDetailAndDefects();
+        } else {
+          renderFloorDashboardAndContent();
+        }
+      }
+    }
+
+    function deleteDefect(defectId) {
+      if (confirm("確定要刪除這筆瑕疵項目嗎？")) {
+        appState.data.defects = appState.data.defects.filter(d => d.id !== defectId);
+        saveState();
+        if (appState.currentUnitId) {
+          renderUnitDetailAndDefects();
+        } else {
+          renderFloorDashboardAndContent();
+        }
+      }
+    }
+
+    // User requirement: Defect Edit Mechanism (修改瑕疵名稱、公司名稱等)
+    function openNewDefectModal() {
+      document.getElementById("defectFormEditId").value = "";
+      document.getElementById("modalDefectFormTitle").textContent = "新增 Defect 瑕疵";
+      document.getElementById("inputDefectName").value = "";
+      document.getElementById("inputSubcontractor").value = "";
+      document.getElementById("inputDefectRemark").value = "";
+      document.getElementById("inputUnitVideo").value = "";
+      document.getElementById("photoPreviewBox").innerHTML = "";
+      document.getElementById("videoStatusBadge").style.display = "none";
+      document.getElementById("selectDefectStatus").value = "待執修";
+      appState.tempUploadedPhotos = [];
+      appState.tempUploadedVideo = "";
+
+      renderPresetDefectTags();
+      renderPresetSubconTags();
+      openModal("modalDefectForm");
+    }
+
+    function openEditDefectModal(defectId) {
+      const d = appState.data.defects.find(item => item.id === defectId);
+      if (!d) return;
+
+      document.getElementById("defectFormEditId").value = d.id;
+      document.getElementById("modalDefectFormTitle").textContent = "編輯 Defect 瑕疵記錄";
+      document.getElementById("inputDefectName").value = d.defectName || "";
+      document.getElementById("inputSubcontractor").value = d.subcontractor || "";
+      document.getElementById("inputDefectRemark").value = d.remark || "";
+      document.getElementById("inputUnitVideo").value = (d.videos && d.videos.length > 0) ? d.videos[0] : "";
+      document.getElementById("selectDefectStatus").value = d.status || "待執修";
+
+      appState.tempUploadedPhotos = d.photos ? [...d.photos] : [];
+      appState.tempUploadedVideo = (d.videos && d.videos.length > 0) ? d.videos[0] : "";
+      renderTempPhotoPreviews();
+
+      renderPresetDefectTags();
+      renderPresetSubconTags();
+      openModal("modalDefectForm");
+    }
+
+    function handlePhotoUpload(input) {
+      if (input.files && input.files.length > 0) {
+        Array.from(input.files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            appState.tempUploadedPhotos.push(dataUrl);
+            renderTempPhotoPreviews();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      input.value = "";
+    }
+
+    function renderTempPhotoPreviews() {
+      const previewBox = document.getElementById("photoPreviewBox");
+      previewBox.innerHTML = "";
+      appState.tempUploadedPhotos.forEach((src, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "media-thumb-container";
+        wrap.innerHTML = `
+          <img src="${src}" class="media-thumb">
+          <button class="thumb-del-btn" onclick="removeTempPhoto(${idx})" title="移除相片">&times;</button>
+        `;
+        previewBox.appendChild(wrap);
+      });
+    }
+
+    function removeTempPhoto(idx) {
+      appState.tempUploadedPhotos.splice(idx, 1);
+      renderTempPhotoPreviews();
+    }
+
+    function handleVideoUpload(input) {
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        appState.tempUploadedVideo = URL.createObjectURL(file);
+        const badge = document.getElementById("videoStatusBadge");
+        badge.style.display = "block";
+        badge.innerHTML = `✓ 已選取影片：<strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+        document.getElementById("inputUnitVideo").value = file.name;
+      }
+      input.value = "";
+    }
+
+    // Save or Update Defect Form Submit
+    function saveDefectFormSubmit() {
+      const editId = document.getElementById("defectFormEditId").value;
+      const defectName = document.getElementById("inputDefectName").value.trim();
+      const subcontractor = document.getElementById("inputSubcontractor").value.trim();
+      const status = document.getElementById("selectDefectStatus").value;
+      const remark = document.getElementById("inputDefectRemark").value.trim();
+      const videoInputVal = document.getElementById("inputUnitVideo").value.trim();
+
+      // Company is strictly required! Defect Name is optional!
+      if (!subcontractor) {
+        alert("【必填提示】請選擇或輸入所屬公司名稱（公司名稱為必填項）！");
+        document.getElementById("inputSubcontractor").focus();
+        return;
+      }
+
+      if (defectName && !appState.data.presetDefectNames.includes(defectName)) {
+        appState.data.presetDefectNames.push(defectName);
+      }
+      if (!appState.data.presetSubcontractors.includes(subcontractor)) {
+        appState.data.presetSubcontractors.push(subcontractor);
+      }
+
+      let photos = [...appState.tempUploadedPhotos];
+      let videos = [];
+      if (appState.tempUploadedVideo) {
+        videos.push(appState.tempUploadedVideo);
+      } else if (videoInputVal) {
+        videos.push(videoInputVal);
+      }
+
+      if (editId) {
+        // UPDATE EXISTING DEFECT
+        const existing = appState.data.defects.find(d => d.id === editId);
+        if (existing) {
+          existing.defectName = defectName;
+          existing.subcontractor = subcontractor;
+          existing.status = status;
+          existing.remark = remark;
+          existing.photos = photos;
+          existing.videos = videos;
+          showToast("瑕疵記錄已更新");
+        }
+      } else {
+        // CREATE NEW DEFECT
+        if (photos.length === 0) {
+          const displayLabel = defectName || subcontractor + " 瑕疵";
+          const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><rect width='160' height='160' fill='%23fed7aa'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%23c2410c'>${encodeURIComponent(displayLabel)}</text></svg>`;
+          photos.push(placeholderSvg);
+        }
+
+        const newDefect = {
+          id: "df-" + Date.now(),
+          unitId: appState.currentUnitId,
+          defectName: defectName,
+          subcontractor: subcontractor,
+          photos: photos,
+          videos: videos,
+          status: status,
+          remark: remark,
+          createdAt: Date.now()
+        };
+        appState.data.defects.push(newDefect);
+        showToast("已成功新增瑕疵");
+      }
+
+      saveState();
+      closeModal("modalDefectForm");
+
+      if (appState.currentUnitId) {
+        renderUnitDetailAndDefects();
+      } else {
+        renderFloorDashboardAndContent();
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = "flex"; }
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+    function openLightbox(src) {
+      document.getElementById("lightboxImg").src = src;
+      openModal("imageLightboxModal");
+    }
+
+    // ==========================================================================
+    // 8. EXCEL EXPORT (Total, Pending, Completed, Completion Rate)
+    // ==========================================================================
+
+    function openExportModal() {
+      selectExportMode(appState.selectedExportMode || "A");
+      openModal("modalExport");
+    }
+
+    function selectExportMode(mode) {
+      appState.selectedExportMode = mode;
+      const cardA = document.getElementById("optModeA");
+      const cardB = document.getElementById("optModeB");
+      if (mode === "A") {
+        cardA.classList.add("selected");
+        cardB.classList.remove("selected");
+        cardA.querySelector('input').checked = true;
+      } else {
+        cardB.classList.add("selected");
+        cardA.classList.remove("selected");
+        cardB.querySelector('input').checked = true;
+      }
+      renderExcelPreview(mode);
+    }
+
+    function renderExcelPreview(mode) {
+      const table = document.getElementById("previewTable");
+      const loc = appState.data.locations.find(l => l.id === appState.currentLocationId);
+      const floorStr = loc ? `${loc.tower} 座 ${loc.floor}` : "9F";
+
+      const floorUnits = appState.data.units.filter(u => u.locationId === appState.currentLocationId);
+      const unitMap = {};
+      floorUnits.forEach(u => { unitMap[u.id] = u.unitName; });
+
+      const unitIds = floorUnits.map(u => u.id);
+      const defects = appState.data.defects.filter(d => unitIds.includes(d.unitId));
+
+      if (mode === "A") {
+        let th = `
+          <thead>
+            <tr>
+              <th>座別樓層</th>
+              <th>單位</th>
+              <th>瑕疵項目</th>
+              <th>所屬公司</th>
+              <th>狀態</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+        let rows = "";
+        const subconMap = {};
+
+        defects.forEach(d => {
+          const uName = unitMap[d.unitId] || "未知單位";
+          if (!subconMap[d.subcontractor]) {
+            subconMap[d.subcontractor] = { total: 0, pending: 0, completed: 0 };
+          }
+          subconMap[d.subcontractor].total += 1;
+          if (d.status === "已完成") subconMap[d.subcontractor].completed += 1;
+          else subconMap[d.subcontractor].pending += 1;
+
+          rows += `
+            <tr>
+              <td>${floorStr}</td>
+              <td><strong>${uName}</strong></td>
+              <td>${d.defectName || '(未註明瑕疵)'}</td>
+              <td>${d.subcontractor}</td>
+              <td><span style="color:${d.status === '已完成' ? '#15803d' : '#b91c1c'}; font-weight:bold;">${d.status}</span></td>
+              <td>${d.remark || '—'}</td>
+            </tr>
+          `;
+        });
+
+        rows += `
+          <tr style="background:#fef3c7; font-weight:bold;">
+            <td colspan="4">【全層瑕疵總數 =COUNT】</td>
+            <td colspan="2" style="color:var(--primary); font-size:0.95rem;">${defects.length} 項</td>
+          </tr>
+          <tr style="background:#dbeafe; font-weight:bold;">
+            <td colspan="6">【各公司瑕疵總數、待執修與已完成數量統計】</td>
+          </tr>
+        `;
+
+        Object.entries(subconMap).forEach(([sub, s]) => {
+          const rate = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
+          rows += `
+            <tr style="background:#f8fafc; font-size:0.8rem;">
+              <td colspan="2"><strong>${sub}</strong></td>
+              <td>總數: <strong>${s.total}</strong></td>
+              <td style="color:var(--danger);">待執修: <strong>${s.pending}</strong></td>
+              <td style="color:var(--success);">已完成: <strong>${s.completed}</strong></td>
+              <td>完成率: <strong>${rate}%</strong></td>
+            </tr>
+          `;
+        });
+
+        table.innerHTML = th + rows + `</tbody>`;
+      } else {
+        let th = `
+          <thead>
+            <tr>
+              <th>序號</th>
+              <th>座別樓層</th>
+              <th>單位</th>
+              <th>瑕疵項目</th>
+              <th>所屬公司</th>
+              <th>相片記錄</th>
+              <th>影片播放</th>
+              <th>狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+        let rows = "";
+        defects.forEach((d, idx) => {
+          const uName = unitMap[d.unitId] || "未知單位";
+          const hasPhoto = d.photos && d.photos.length > 0;
+          const hasVideo = d.videos && d.videos.length > 0;
+          rows += `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${floorStr}</td>
+              <td><strong>${uName}</strong></td>
+              <td>${d.defectName || '(未註明瑕疵)'}</td>
+              <td>${d.subcontractor}</td>
+              <td>${hasPhoto ? '[已內嵌照片]' : '無'}</td>
+              <td>${hasVideo ? '<span style="color:#2563eb;">影片連結</span>' : '無'}</td>
+              <td><span style="color:${d.status === '已完成' ? '#15803d' : '#b91c1c'}; font-weight:bold;">${d.status}</span></td>
+            </tr>
+          `;
+        });
+        table.innerHTML = th + rows + `</tbody>`;
+      }
+    }
+
+    function executeExcelExport() {
+      const mode = appState.selectedExportMode;
+      const loc = appState.data.locations.find(l => l.id === appState.currentLocationId);
+      const floorName = loc ? `${loc.tower}_${loc.floor}` : "9F";
+      const filename = `恆威執修清單_${floorName}_${mode === 'A' ? '簡易匯總表' : '詳細清單'}.xls`;
+
+      const floorUnits = appState.data.units.filter(u => u.locationId === appState.currentLocationId);
+      const unitMap = {};
+      floorUnits.forEach(u => { unitMap[u.id] = u.unitName; });
+
+      const unitIds = floorUnits.map(u => u.id);
+      const defects = appState.data.defects.filter(d => unitIds.includes(d.unitId));
+
+      let excelHtml = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+              xmlns:x="urn:schemas-microsoft-com:office:excel" 
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+          <!--[if gte mso 9]>
+          <xml>
+            <x:ExcelWorkbook>
+              <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                  <x:Name>${mode === 'A' ? '恆威執修匯總表' : '恆威詳細清單'}</x:Name>
+                  <x:WorksheetOptions>
+                    <x:DisplayGridlines/>
+                  </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+              </x:ExcelWorksheets>
+            </x:ExcelWorkbook>
+          </xml>
+          <![endif]-->
+          <style>
+            td, th { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 11pt; border: 0.5pt solid #cbd5e1; padding: 6px 10px; }
+            .header-cell { background-color: #1e3a8a; color: #ffffff; font-weight: bold; text-align: center; }
+            .sub-header { background-color: #dbeafe; color: #1e3a8a; font-weight: bold; }
+            .total-cell { background-color: #fef3c7; color: #92400e; font-weight: bold; }
+            .status-pending { color: #dc2626; font-weight: bold; }
+            .status-done { color: #16a34a; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h2>恆威執修清單 - BSC Defect Rectification Inspection & Management Platform</h2>
+          <p>巡查區域: ${loc ? loc.tower + ' 座 ' + loc.floor : '9F'} | 匯出時間: ${new Date().toLocaleString()}</p>
+          <br/>
+      `;
+
+      if (mode === "A") {
+        excelHtml += `
+          <table border="1">
+            <thead>
+              <tr>
+                <th class="header-cell">座別樓層</th>
+                <th class="header-cell">單位</th>
+                <th class="header-cell">瑕疵項目 (Defect)</th>
+                <th class="header-cell">所屬公司 (Subcontractor)</th>
+                <th class="header-cell">執修狀態</th>
+                <th class="header-cell">具體備註</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        const subconMap = {};
+        defects.forEach(d => {
+          const uName = unitMap[d.unitId] || "未知單位";
+          if (!subconMap[d.subcontractor]) {
+            subconMap[d.subcontractor] = { total: 0, pending: 0, completed: 0 };
+          }
+          subconMap[d.subcontractor].total += 1;
+          if (d.status === "已完成") subconMap[d.subcontractor].completed += 1;
+          else subconMap[d.subcontractor].pending += 1;
+
+          const statusClass = d.status === '已完成' ? 'status-done' : 'status-pending';
+
+          excelHtml += `
+            <tr>
+              <td>${loc ? loc.tower + ' 座 ' + loc.floor : '9F'}</td>
+              <td><b>${uName}</b></td>
+              <td>${d.defectName || '(未註明瑕疵)'}</td>
+              <td>${d.subcontractor}</td>
+              <td class="${statusClass}">${d.status}</td>
+              <td>${d.remark || ''}</td>
+            </tr>
+          `;
+        });
+
+        excelHtml += `
+            <tr class="total-cell">
+              <td colspan="4" align="right"><b>【全層瑕疵總數 =COUNT】</b></td>
+              <td colspan="2"><b>${defects.length} 項</b></td>
+            </tr>
+            <tr><td colspan="6" style="border:none; height:15px;"></td></tr>
+            <tr class="sub-header">
+              <td colspan="6"><b>【所屬分判商責任統計看板 (總數 | 待執修 | 已完成 | 完成率)】</b></td>
+            </tr>
+            <tr style="background:#f1f5f9; font-weight:bold;">
+              <td colspan="2">分判商公司名稱</td>
+              <td align="right">總瑕疵數量</td>
+              <td align="right">待執修數量</td>
+              <td align="right">已完成數量</td>
+              <td align="right">執修完成率 (%)</td>
+            </tr>
+        `;
+
+        Object.entries(subconMap).forEach(([sub, s]) => {
+          const rate = s.total > 0 ? ((s.completed / s.total) * 100).toFixed(1) : 0;
+          excelHtml += `
+            <tr>
+              <td colspan="2"><b>${sub}</b></td>
+              <td align="right"><b>${s.total}</b></td>
+              <td align="right" class="status-pending">${s.pending}</td>
+              <td align="right" class="status-done">${s.completed}</td>
+              <td align="right"><b>${rate}%</b></td>
+            </tr>
+          `;
+        });
+
+        excelHtml += `</tbody></table>`;
+      } else {
+        excelHtml += `
+          <table border="1">
+            <thead>
+              <tr>
+                <th class="header-cell">序號</th>
+                <th class="header-cell">座別樓層</th>
+                <th class="header-cell">單位</th>
+                <th class="header-cell">瑕疵項目</th>
+                <th class="header-cell">所屬公司</th>
+                <th class="header-cell">現場相片說明</th>
+                <th class="header-cell">影片播放超連結</th>
+                <th class="header-cell">執修狀態</th>
+                <th class="header-cell">具體備註</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        defects.forEach((d, idx) => {
+          const uName = unitMap[d.unitId] || "未知單位";
+          const hasPhoto = d.photos && d.photos.length > 0;
+          const hasVideo = d.videos && d.videos.length > 0;
+          const videoLink = hasVideo ? `<a href="${d.videos[0]}">點擊播放影片</a>` : '無';
+          const statusClass = d.status === '已完成' ? 'status-done' : 'status-pending';
+
+          excelHtml += `
+            <tr>
+              <td align="center">${idx + 1}</td>
+              <td>${loc ? loc.tower + ' 座 ' + loc.floor : '9F'}</td>
+              <td><b>${uName}</b></td>
+              <td>${d.defectName || '(未註明瑕疵)'}</td>
+              <td>${d.subcontractor}</td>
+              <td>${hasPhoto ? '[已附照片記錄]' : '無照片'}</td>
+              <td>${videoLink}</td>
+              <td class="${statusClass}">${d.status}</td>
+              <td>${d.remark || ''}</td>
+            </tr>
+          `;
+        });
+
+        excelHtml += `</tbody></table>`;
+      }
+
+      excelHtml += `</body></html>`;
+
+      const blob = new Blob([excelHtml], { type: "application/vnd.ms-excel;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      closeModal("modalExport");
+    }
+
+    // ==========================================================================
+    // 9. CLOUD SYNC & TEAM COLLABORATION
+    // ==========================================================================
+
+    function openCloudSyncModal() {
+      openModal("modalCloudSync");
+    }
+
+    function exportDataPackage() {
+      const packageData = {
+        app: "HENG_WAI_BSC_DLP",
+        version: "7.0",
+        exportedAt: new Date().toISOString(),
+        data: appState.data
+      };
+      const jsonStr = JSON.stringify(packageData, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `BSC_執修數據封包_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("已下載團隊共享封包");
+    }
+
+    function handleImportJson(input) {
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (!parsed.data || !parsed.data.locations) {
+              alert("檔案格式不正確，不是有效的執修數據封包！");
+              return;
+            }
+
+            parsed.data.locations.forEach(newLoc => {
+              if (!appState.data.locations.some(l => l.id === newLoc.id)) {
+                appState.data.locations.push(newLoc);
+              }
+            });
+
+            parsed.data.units.forEach(newUnit => {
+              if (!appState.data.units.some(u => u.id === newUnit.id)) {
+                appState.data.units.push(newUnit);
+              }
+            });
+
+            let newDefectCount = 0;
+            parsed.data.defects.forEach(newDefect => {
+              const existing = appState.data.defects.find(d => d.id === newDefect.id);
+              if (!existing) {
+                appState.data.defects.push(newDefect);
+                newDefectCount++;
+              } else {
+                existing.status = newDefect.status;
+                if (newDefect.remark) existing.remark = newDefect.remark;
+              }
+            });
+
+            saveState();
+            closeModal("modalCloudSync");
+            alert(`成功合併同事的數據！共新增了 ${newDefectCount} 項瑕疵記錄。`);
+            showViewFloors();
+          } catch(err) {
+            alert("解析數據封包失敗：" + err.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+      input.value = "";
+    }
+
+    // ==========================================================================
+    // INITIALIZATION
+    // ==========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      showViewFloors();
+    });
+  </script>
+</body>
+</html>
